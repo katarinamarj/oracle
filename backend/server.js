@@ -18,9 +18,9 @@ const PORT = 4000;
 
 initPool()
   .then(() => {
-    app.listen(PORT, () => console.log(`API on http://localhost:${PORT} ✅`));
+    app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
   })
   .catch((err) => {
-    console.error("Oracle pool init error:", err);
+    console.error("Error:", err);
     process.exit(1);
   });

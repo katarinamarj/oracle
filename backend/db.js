@@ -13,7 +13,7 @@ async function initPool() {
     poolMax: 5,
     poolIncrement: 1,
   });
-  console.log("Oracle pool ready ✅");
+  console.log("Uspostavljena je konekcija sa Oracle bazom.");
 }
 
 async function getConn() {
