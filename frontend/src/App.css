@@ -1,4 +1,3 @@
-/* GLOBAL */
 html,
 body,
 #root {
@@ -9,18 +8,17 @@ body,
   color: white;
 }
 
-/* APP LAYOUT */
 .app {
   display: flex;
-  min-height: 100vh;          /* ⬅️ ključno */
+  min-height: 100vh;         
   background: #1f1f1f;
 }
 
-/* SIDEBAR */
+
 .sidebar {
   width: 280px;
-  height: 100vh;              /* zauzima celu visinu ekrana */
-  overflow-y: auto;           /* OMOGUĆAVA SKROL */
+  height: 100vh;            
+  overflow-y: auto;          
   overflow-x: hidden;
   border-right: 1px solid #444;
   padding: 12px;
@@ -55,11 +53,10 @@ body,
   background: #2f2f2f;
 }
 
-/* MAIN CONTENT */
 .main {
   flex: 1;
   padding: 12px;
-  min-height: 100vh;          /* ⬅️ popunjava ekran */
+  min-height: 100vh;         
   background: #1f1f1f;
   overflow: auto;
 }
@@ -68,7 +65,6 @@ body,
   margin-top: 0;
 }
 
-/* ERROR */
 .errorBox {
   background: #ffd6d6;
   color: #111;
@@ -78,7 +74,6 @@ body,
   border: 1px solid #ff9b9b;
 }
 
-/* FORM CARD */
 .formCard {
   border: 1px solid #444;
   border-radius: 10px;
@@ -87,7 +82,6 @@ body,
   background: #161616;
 }
 
-/* PARTITIONS */
 .partitions {
   display: flex;
   gap: 8px;
@@ -108,7 +102,6 @@ body,
   background: #2f2f2f;
 }
 
-/* FORM ROW */
 .formRow {
   display: flex;
   gap: 8px;
@@ -125,7 +118,6 @@ body,
   color: white;
 }
 
-/* TECH BOX */
 .techBox {
   display: flex;
   gap: 8px;
@@ -136,7 +128,6 @@ body,
   background: #101010;
 }
 
-/* BUTTONS */
 .btn {
   padding: 8px 14px;
   border-radius: 8px;
@@ -150,7 +141,6 @@ body,
   background: #111;
 }
 
-/* TABLE */
 .tableWrap {
   border: 1px solid #444;
   border-radius: 10px;
@@ -187,7 +177,6 @@ body,
   white-space: nowrap;
 }
 
-/* TABLE ROWS */
 .trRow {
   cursor: pointer;
   background: transparent;
@@ -197,7 +186,6 @@ body,
   background: #2b2b2b;
 }
 
-/* DELETE BUTTON */
 .deleteBtn {
   padding: 6px 10px;
   border-radius: 8px;
