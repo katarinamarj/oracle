@@ -1,42 +1,208 @@
+/* GLOBAL */
+html,
+body,
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  height: 100%;
+  margin: 0;
+  background: #1f1f1f;
+  font-family: Arial, sans-serif;
+  color: white;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* APP LAYOUT */
+.app {
+  display: flex;
+  min-height: 100vh;          /* ⬅️ ključno */
+  background: #1f1f1f;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* SIDEBAR */
+.sidebar {
+  width: 280px;
+  height: 100vh;              /* zauzima celu visinu ekrana */
+  overflow-y: auto;           /* OMOGUĆAVA SKROL */
+  overflow-x: hidden;
+  border-right: 1px solid #444;
+  padding: 12px;
+  background: #1f1f1f;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+
+.sidebarTitle {
+  margin-top: 0;
 }
 
-.card {
-  padding: 2em;
+.sidebarTitleSecond {
+  margin-top: 16px;
 }
 
-.read-the-docs {
-  color: #888;
+.sidebarItem {
+  margin: 2px 0;
+}
+
+.sidebarButton {
+  width: 100%;
+  padding: 8px 10px;
+  cursor: pointer;
+  background: #111;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.sidebarButtonActive {
+  background: #2f2f2f;
+}
+
+/* MAIN CONTENT */
+.main {
+  flex: 1;
+  padding: 12px;
+  min-height: 100vh;          /* ⬅️ popunjava ekran */
+  background: #1f1f1f;
+  overflow: auto;
+}
+
+.mainTitle {
+  margin-top: 0;
+}
+
+/* ERROR */
+.errorBox {
+  background: #ffd6d6;
+  color: #111;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #ff9b9b;
+}
+
+/* FORM CARD */
+.formCard {
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #161616;
+}
+
+/* PARTITIONS */
+.partitions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.pillBtn {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #444;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.pillBtnActive {
+  background: #2f2f2f;
+}
+
+/* FORM ROW */
+.formRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.input {
+  padding: 8px;
+  min-width: 180px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #0f0f0f;
+  color: white;
+}
+
+/* TECH BOX */
+.techBox {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  background: #101010;
+}
+
+/* BUTTONS */
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: white;
+  cursor: pointer;
+}
+
+.btnClear {
+  background: #111;
+}
+
+/* TABLE */
+.tableWrap {
+  border: 1px solid #444;
+  border-radius: 10px;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 70vh;
+  background: #151515;
+}
+
+.table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+}
+
+.thSticky {
+  position: sticky;
+  top: 0;
+  background: #222;
+  color: white;
+  z-index: 1;
+}
+
+.colFixed {
+  min-width: 160px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actionsCol {
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+/* TABLE ROWS */
+.trRow {
+  cursor: pointer;
+  background: transparent;
+}
+
+.trSelected {
+  background: #2b2b2b;
+}
+
+/* DELETE BUTTON */
+.deleteBtn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #3a1c1c;
+  color: white;
+  cursor: pointer;
 }
