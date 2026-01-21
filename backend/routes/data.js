@@ -2,10 +2,26 @@ const express = require("express");
 const router = express.Router();
 const { oracledb, getConn } = require("../db");
 
-function validateName(name) {
-  if (!/^[A-Z0-9_]+$/i.test(name)) {
+async function checkTableOrView(conn, name) {
+  const r = await conn.execute(
+    `
+    SELECT 1 AS OK
+    FROM (
+      SELECT table_name AS name FROM user_tables
+      UNION ALL
+      SELECT view_name  AS name FROM user_views
+    )
+    WHERE UPPER(name) = UPPER(:name)
+    FETCH FIRST 1 ROWS ONLY
+    `,
+    { name },
+    { outFormat: oracledb.OUT_FORMAT_OBJECT }
+  );
+
+  if (!r.rows || r.rows.length === 0) {
     throw new Error("Neispravno ime tabele ili pogleda.");
   }
+
   return name;
 }
 
@@ -25,12 +41,7 @@ function isDateColumn(colName) {
   return c.startsWith("DATUM") || c.includes("VREME");
 }
 
-function normalizeDate(val) {
-  if (typeof val !== "string") return val;
-  return val.trim().replace(/\.$/, "");
-}
-
-function normalizeBindValue(v) {
+function normalizeEmptyValue(v) {
   if (v === "") return null;
   return v;
 }
@@ -38,8 +49,8 @@ function normalizeBindValue(v) {
 router.get("/:name", async (req, res) => {
   let conn;
   try {
-    const name = validateName(req.params.name);
     conn = await getConn();
+    const name = await checkTableOrView(conn, req.params.name);
 
     try {
       const sql = `SELECT t.*, ROWIDTOCHAR(t.ROWID) AS "__ROWID" FROM ${name} t`;
@@ -61,9 +72,10 @@ router.post("/:name", async (req, res) => {
   let conn;
 
   try {
-    const name = validateName(req.params.name);
-    const values = req.body.values || {};
+    conn = await getConn();
+    const name = await checkTableOrView(conn, req.params.name);
 
+    const values = req.body.values || {};
     const cols = Object.keys(values);
     if (cols.length === 0) throw new Error("Nema vrednosti za INSERT.");
 
@@ -78,38 +90,29 @@ router.post("/:name", async (req, res) => {
           throw new Error("TEHNICKIPODACI mora biti objekat.");
         }
 
-        binds.km = normalizeBindValue(obj.KILOMETRAZA);
-        binds.pr = normalizeBindValue(obj.PRITISAK);
-        binds.dot = normalizeBindValue(obj.DOT);
-        binds.dg = normalizeBindValue(obj.DUBINA_GUME);
+        binds.km = normalizeEmptyValue(obj.KILOMETRAZA);
+        binds.pr = normalizeEmptyValue(obj.PRITISAK);
+        binds.dot = normalizeEmptyValue(obj.DOT);
+        binds.dg = normalizeEmptyValue(obj.DUBINA_GUME);
 
         return `VULKANIZER.TEHNICKIPODACIGUME_T(:km, :pr, :dot, :dg)`;
       }
 
       const key = `b${i}`;
-      let v = values[c];
-
-      if (isDateColumn(c)) v = normalizeDate(v);
-
-      binds[key] = normalizeBindValue(v);
+      const v = values[c];
+      binds[key] = normalizeEmptyValue(v);
 
       const ot = isSpecialObjectType(name, c);
-      if (ot) {
-        return `${ot}(:${key})`;
-      }
+      if (ot) return `${ot}(:${key})`;
 
-      if (isDateColumn(c)) {
-        return `TO_DATE(:${key}, 'DD.MM.YYYY')`;
-      }
+      if (isDateColumn(c)) return `TO_DATE(:${key}, 'DD.MM.YYYY.')`;
 
       return `:${key}`;
     });
 
     const sql = `INSERT INTO ${name} (${cols.join(", ")}) VALUES (${placeholders.join(", ")})`;
 
-    conn = await getConn();
     await conn.execute(sql, binds, { autoCommit: true });
-
     res.json({ ok: true });
   } catch (err) {
     res.status(400).json({ ok: false, error: { message: err.message } });
@@ -121,16 +124,15 @@ router.post("/:name", async (req, res) => {
 router.put("/:name/:rowid", async (req, res) => {
   let conn;
   try {
-    const name = validateName(req.params.name);
-    const rowid = req.params.rowid;
+    conn = await getConn();
+    const name = await checkTableOrView(conn, req.params.name);
 
+    const rowid = req.params.rowid;
     const values = req.body.values || {};
     delete values.__ROWID;
 
     const cols = Object.keys(values);
     if (cols.length === 0) throw new Error("Nema vrednosti za UPDATE.");
-
-    conn = await getConn();
 
     const binds = { rid: rowid };
     const setParts = [];
@@ -164,24 +166,19 @@ router.put("/:name/:rowid", async (req, res) => {
         DUBINA_GUME: obj.DUBINA_GUME ?? oldT.DUBINA_GUME ?? null,
       };
 
-      binds.km = normalizeBindValue(merged.KILOMETRAZA);
-      binds.pr = normalizeBindValue(merged.PRITISAK);
-      binds.dot = normalizeBindValue(merged.DOT);
-      binds.dg = normalizeBindValue(merged.DUBINA_GUME);
+      binds.km = normalizeEmptyValue(merged.KILOMETRAZA);
+      binds.pr = normalizeEmptyValue(merged.PRITISAK);
+      binds.dot = normalizeEmptyValue(merged.DOT);
+      binds.dg = normalizeEmptyValue(merged.DUBINA_GUME);
 
       setParts.push(`TEHNICKIPODACI = VULKANIZER.TEHNICKIPODACIGUME_T(:km, :pr, :dot, :dg)`);
-
       delete values.TEHNICKIPODACI;
     }
 
-    const restCols = Object.keys(values);
-    restCols.forEach((c, i) => {
+    Object.keys(values).forEach((c, i) => {
       const key = `b${i}`;
-      let v = values[c];
-
-      if (isDateColumn(c)) v = normalizeDate(v);
-
-      binds[key] = normalizeBindValue(v);
+      const v = values[c];
+      binds[key] = normalizeEmptyValue(v);
 
       const ot = isSpecialObjectType(name, c);
       if (ot) {
@@ -190,7 +187,7 @@ router.put("/:name/:rowid", async (req, res) => {
       }
 
       if (isDateColumn(c)) {
-        setParts.push(`${c} = TO_DATE(:${key}, 'DD.MM.YYYY')`);
+        setParts.push(`${c} = TO_DATE(:${key}, 'DD.MM.YYYY.')`);
         return;
       }
 
@@ -216,10 +213,11 @@ router.put("/:name/:rowid", async (req, res) => {
 router.delete("/:name/:rowid", async (req, res) => {
   let conn;
   try {
-    const name = validateName(req.params.name);
+    conn = await getConn();
+    const name = await checkTableOrView(conn, req.params.name);
+
     const rowid = req.params.rowid;
 
-    conn = await getConn();
     const sql = `DELETE FROM ${name} WHERE ROWID = CHARTOROWID(:rid)`;
     const r = await conn.execute(sql, { rid: rowid }, { autoCommit: true });
 
