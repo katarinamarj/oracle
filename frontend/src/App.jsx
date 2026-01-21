@@ -147,10 +147,6 @@ export default function App() {
         setError("Klikni na red u tabeli za UPDATE.");
         return;
       }
-      if (!originalRow) {
-        setError("Prvo klikni na red da se učita originalni sadržaj.");
-        return;
-      }
 
       const next = normalizeFormForSubmit();
 

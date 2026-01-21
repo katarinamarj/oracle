@@ -18,7 +18,7 @@ export default function DataTable({
                 {c}
               </th>
             ))}
-            <th className="thSticky actionsCol">AKCIJE</th>
+            <th className="thSticky actionsCol"></th>
           </tr>
         </thead>
 
